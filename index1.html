@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الطباعة عبر الويب</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eaeaea;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+      background-image: url(college1.jpg);
+      background-size: cover; /* لتغطية الخلفية بشكل كامل */
+      background-position: center; /* مركزية الصورة */
+    }
+
+    header {
+      background-color: #2c3e50; /* لون داكن جذاب */
+      color: #ecf0f1; /* لون فاتح للنص */
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* إضافة ظل خفيف */
+    }
+
+    input[type="file"], textarea {
+      margin: 10px;
+      padding: 10px;
+      width: 80%;
+      max-width: 600px; /* تحديد الحد الأقصى لعرض الحقول */
+      border: 1px solid #bdc3c7; /* لون حدود فاتح */
+      border-radius: 4px;
+      font-size: 16px; /* حجم خط أكبر */
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #3498db; /* لون أزرق جذاب */
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s; /* إضافة تأثير التحول */
+    }
+
+    button:hover {
+      background-color: #2980b9; /* لون أغمق عند التحويم */
+      transform: scale(1.05); /* تكبير بسيط */
+    }
+
+    #statusMessage {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #e74c3c; /* لون أحمر لرسائل الحالة */
+    }
+
+    @media (max-width: 600px) {
+      /* تخصيص التصميم لأجهزة الجوال */
+      input[type="file"], textarea {
+        width: 95%; /* زيادة العرض في الهواتف */
+      }
+
+      header {
+        font-size: 1.2em; /* زيادة حجم الخط في العنوان */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>طباعة الملفات أو النصوص</h1>
+  </header>
+
+  <section>
+    <h2>تحميل ملف للطباعة</h2>
+    <input type="file" id="fileInput">
+    <button onclick="uploadFile()">إرسال للطباعة</button>
+
+    <h2>أو أدخل نصًا للطباعة</h2>
+    <textarea id="textInput" rows="5" placeholder="أدخل النص هنا..."></textarea>
+    <button onclick="sendText()">طباعة النص</button>
+
+    <p id="statusMessage"></p>
+  </section>
+
+  <script>
+    function uploadFile() {
+      const file = document.getElementById('fileInput').files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/print-file', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('statusMessage').innerText = data.message;
+        });
+      } else {
+        alert('الرجاء اختيار ملف للطباعة.');
+      }
+    }
+
+    function sendText() {
+      const text = document.getElementById('textInput').value;
+      if (text) {
+        fetch('/print-text', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text: text })
+        })
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('statusMessage').innerText = data.message;
+        });
+      } else {
+        alert('الرجاء إدخال نص للطباعة.');
+      }
+    }
+  </script>
+
+</body>
+</html>
